@@ -1,47 +1,29 @@
-version: '3.8'
-
 services:
-  app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    ports:
-      - "3000:3000"
-    environment:
-      - NODE_ENV=development
-      - PORT=3000
-      - MONGODB_URI=mongodb://mongodb:27017
-      - DB_NAME=backend-template
-      - JWT_SECRET=development_jwt_secret_key_123
-      - CORS_WHITELIST=http://localhost:3000
-      - GITHUB_REPO_URL=https://github.com/your-username/backend-template
-      - AWS_ACCESS_KEY_ID=your_aws_access_key
-      - AWS_SECRET_ACCESS_KEY=your_aws_secret_key
-      - AWS_REGION=your_aws_region
-      - AWS_S3_BUCKET=your_s3_bucket
-      - AWS_EC2_IMAGE_ID=your_aws_ec2_image_id
-      - AWS_EC2_INSTANCE_TYPE=your_aws_ec2_instance_type
-      - AWS_EC2_MIN_COUNT=1
-      - AWS_EC2_MAX_COUNT=1
-      - AWS_EC2_KEY_NAME=your_aws_ec2_key_name
-      - AWS_EC2_SECURITY_GROUP_IDS=your_aws_ec2_security_grouo_ids
-    depends_on:
-      - mongodb
-    networks:
-      - app-network
-
   mongodb:
     image: mongo:latest
+    container_name: intelligent-assistant-mongodb
+    restart: unless-stopped
     ports:
       - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: intelligent-assistant
     volumes:
       - mongodb_data:/data/db
+      - mongodb_config:/data/configdb
     networks:
-      - app-network
-
-networks:
-  app-network:
-    driver: bridge
+      - intelligent-assistant-network
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 volumes:
-  mongodb_data: 
+  mongodb_data:
+    driver: local
+  mongodb_config:
+    driver: local
+
+networks:
+  intelligent-assistant-network:
+    driver: bridge

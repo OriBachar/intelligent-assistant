@@ -4,13 +4,8 @@ import { config } from './config/env';
 import middleware from './middleware/middleware';
 import errorHandler from './middleware/errorHandler';
 import indexRoutes from './routes/index';
-import { setupSwagger } from './config/swagger';
 
 const app = express();
-
-if (config.server.env === 'development') {
-  setupSwagger(app);
-}
 
 app.use(middleware);
 app.use('/api', indexRoutes);

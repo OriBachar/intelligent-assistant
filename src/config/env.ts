@@ -22,25 +22,16 @@ export const config = {
         uri: getEnv('MONGODB_URI', true),
         dbName: getEnv('DB_NAME', true)
     },
-    jwt: {
-        secret: getEnv('JWT_SECRET', true)
+    groq: {
+        apiKey: getEnv('GROQ_API_KEY', true)
     },
-    aws: {
-        accessKeyId: getEnv('AWS_ACCESS_KEY_ID'),
-        secretAccessKey: getEnv('AWS_SECRET_ACCESS_KEY'),
-        region: getEnv('AWS_REGION'),
-        s3Bucket: getEnv('AWS_S3_BUCKET'),
-        ec2: {
-            imageId: getEnv('AWS_EC2_IMAGE_ID'),
-            instanceType: getEnv('AWS_EC2_INSTANCE_TYPE') || 't2.micro',
-            minCount: parseInt(getEnv('AWS_EC2_MIN_COUNT') || '1'),
-            maxCount: parseInt(getEnv('AWS_EC2_MAX_COUNT') || '1'),
-            keyName: getEnv('AWS_EC2_KEY_NAME'),
-            securityGroupIds: getEnv('AWS_EC2_SECURITY_GROUP_IDS') ?
-                getEnv('AWS_EC2_SECURITY_GROUP_IDS').split(',') : undefined
+    nfl: {
+        balldontlie: {
+            apiKey: getEnv('BALLDONTLIE_API_KEY', true)
+        },
+        apiSports: {
+            apiKey: getEnv('API_SPORTS_KEY', true),
+            baseUrl: getEnv('API_SPORTS_BASE_URL') || 'https://v1.american-football.api-sports.io'
         }
-    },
-    git: {
-        repoUrl: getEnv('GITHUB_REPO_URL', true)
     }
 };
