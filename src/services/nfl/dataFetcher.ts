@@ -1,5 +1,6 @@
 import * as balldontlie from './balldontlieService';
 import * as apiSports from './apiSportsService';
+import { searchNflTopic } from './wikipediaService';
 import { selectApi } from './apiSelector';
 import type { ParsedQuery } from '../../types/queryParser';
 
@@ -89,13 +90,22 @@ const fetchGameData = async (entities: any, useApiSports: boolean = false) => {
         : await balldontlie.getGames({ per_page: 10 });
 };
 
-export const fetchNflData = async (parsedQuery: ParsedQuery): Promise<any> => {
-    if (!parsedQuery.entities) {
-        return null;
-    }
-
+export const fetchNflData = async (parsedQuery: ParsedQuery, userInput?: string): Promise<any> => {
     try {
         const selectedApi = selectApi(parsedQuery);
+        
+        if (selectedApi === 'wikipedia') {
+            if (userInput) {
+                const wikipediaData = await searchNflTopic(userInput);
+                return wikipediaData ? { source: 'wikipedia', content: wikipediaData } : null;
+            }
+            return null;
+        }
+
+        if (!parsedQuery.entities) {
+            return null;
+        }
+
         const useApiSports = selectedApi === 'apisports' || selectedApi === 'both';
 
         const { intent, entities, filters } = parsedQuery;

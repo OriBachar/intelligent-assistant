@@ -48,8 +48,12 @@ const isHistoricalQuery = (intent: string, entities?: any): boolean => {
     return false;
 };
 
-export const selectApi = (parsedQuery: ParsedQuery): 'balldontlie' | 'apisports' | 'both' => {
+export const selectApi = (parsedQuery: ParsedQuery): 'balldontlie' | 'apisports' | 'both' | 'wikipedia' => {
     const { intent, entities, filters } = parsedQuery;
+
+    if (intent === 'general') {
+        return 'wikipedia';
+    }
 
     const isRealTime = isRealTimeQuery(intent, entities, filters);
     const isHistorical = isHistoricalQuery(intent, entities);

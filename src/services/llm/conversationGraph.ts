@@ -54,7 +54,10 @@ export const runConversation = async (
     let apiData = null;
     if (needsApiData) {
         const parsedQuery = await parseQuery(userInput, intent);
-        apiData = await fetchNflData(parsedQuery);
+        apiData = await fetchNflData(parsedQuery, userInput);
+    } else if (intent === 'general') {
+        const parsedQuery = await parseQuery(userInput, intent);
+        apiData = await fetchNflData(parsedQuery, userInput);
     }
     
     let response = await generateResponse(userInput, conversationHistory, apiData);
