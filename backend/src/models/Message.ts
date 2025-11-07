@@ -4,7 +4,7 @@ export interface IMessage extends Document {
     conversationId: Types.ObjectId;
     role: 'user' | 'assistant';
     content: string;
-    intent?: 'game' | 'player' | 'team' | 'general';
+    intent?: 'game' | 'developer' | 'platform' | 'general';
     metadata?: {
         apiDataUsed?: boolean;
         [key: string]: any;
@@ -33,7 +33,7 @@ const MessageSchema = new Schema<IMessage>(
         },
         intent: {
             type: String,
-            enum: ['game', 'player', 'team', 'general'],
+            enum: ['game', 'developer', 'platform', 'general'],
         },
         metadata: {
             type: Schema.Types.Mixed,

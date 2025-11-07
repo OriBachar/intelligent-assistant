@@ -25,13 +25,16 @@ export const config = {
     groq: {
         apiKey: getEnv('GROQ_API_KEY', true)
     },
-    nfl: {
-        balldontlie: {
-            apiKey: getEnv('BALLDONTLIE_API_KEY', true)
+    games: {
+        rawg: {
+            apiKey: getEnv('RAWG_API_KEY')
         },
-        apiSports: {
-            apiKey: getEnv('API_SPORTS_KEY', true),
-            baseUrl: getEnv('API_SPORTS_BASE_URL') || 'https://v1.american-football.api-sports.io'
+        igdb: {
+            clientId: getEnv('IGDB_CLIENT_ID'),
+            clientSecret: getEnv('IGDB_CLIENT_SECRET')
+        },
+        steam: {
+            apiKey: getEnv('STEAM_API_KEY')
         }
     }
 };

@@ -1,7 +1,5 @@
-import { getDefaultModel } from '../llm/groqService';
+import { getLightweightModel } from '../llm/groqService';
 import { getFactCheckPrompt } from '../prompts/safetyPrompts';
-import type { Game as BalldontlieGame } from '../../types/balldontlie';
-import type { Game as ApiSportsGame } from '../../types/apiSports';
 
 export interface FactCheckResult {
     isValid: boolean;
@@ -11,60 +9,87 @@ export interface FactCheckResult {
     unverifiedClaims: string[];
 }
 
-const validateScoreAgainstData = (homeScore: number, awayScore: number, apiData: any): boolean => {
-    if (!apiData) return false;
-
-    if (apiData.data && Array.isArray(apiData.data)) {
-        for (const game of apiData.data) {
-            if ((game as BalldontlieGame).home_team_score === homeScore && 
-                (game as BalldontlieGame).visitor_team_score === awayScore) {
-                return true;
-            }
+const extractNumbers = (text: string, pattern: RegExp): number[] => {
+    const matches = text.matchAll(pattern);
+    const numbers: number[] = [];
+    for (const match of matches) {
+        const num = parseFloat(match[0].replace(/[^0-9.]/g, ''));
+        if (!isNaN(num)) {
+            numbers.push(num);
         }
     }
+    return numbers;
+};
 
-    if (apiData.response && Array.isArray(apiData.response)) {
-        for (const game of apiData.response) {
-            if ((game as ApiSportsGame).scores?.home === homeScore && 
-                (game as ApiSportsGame).scores?.away === awayScore) {
-                return true;
-            }
-        }
+const validatePrice = (price: number, apiData: any): boolean => {
+    if (!apiData?.data) return false;
+
+    const data = apiData.data;
+    
+    if (data.price) {
+        const apiPrice = typeof data.price === 'object' ? data.price.final : data.price;
+        return Math.abs(apiPrice - price) < 0.01;
     }
 
-    if ((apiData as BalldontlieGame).home_team_score === homeScore && 
-        (apiData as BalldontlieGame).visitor_team_score === awayScore) {
-        return true;
-    }
-
-    if ((apiData as ApiSportsGame).scores?.home === homeScore && 
-        (apiData as ApiSportsGame).scores?.away === awayScore) {
-        return true;
+    if (data.gameDetails?.price_overview) {
+        const apiPrice = data.gameDetails.price_overview.final / 100;
+        return Math.abs(apiPrice - price) < 0.01;
     }
 
     return false;
 };
 
-const extractScores = (text: string): Array<{ home: number; away: number; text: string }> => {
-    const scores: Array<{ home: number; away: number; text: string }> = [];
+const validateRating = (rating: number, apiData: any): boolean => {
+    if (!apiData?.data) return false;
+
+    const data = apiData.data;
     
-    const scorePattern = /\b(\d{1,2})[\s-]+to[\s-]+(\d{1,2})\b|\b(\d{1,2})[\s-]+(\d{1,2})\b/g;
-    const matches = text.matchAll(scorePattern);
-    
-    for (const match of matches) {
-        const num1 = parseInt(match[1] || match[3]);
-        const num2 = parseInt(match[2] || match[4]);
-        
-        if (num1 >= 0 && num1 <= 100 && num2 >= 0 && num2 <= 100) {
-            scores.push({
-                home: num1,
-                away: num2,
-                text: match[0],
-            });
+    if (data.rating !== undefined) {
+        return Math.abs(data.rating - rating) < 0.1;
+    }
+
+    if (data.gameDetails?.rating) {
+        return Math.abs(data.gameDetails.rating - rating) < 0.1;
+    }
+
+    if (data.game?.rating) {
+        return Math.abs(data.game.rating - rating) < 0.1;
+    }
+
+    return false;
+};
+
+const validateGameData = (response: string, apiData: any): { verified: string[]; unverified: string[] } => {
+    const verified: string[] = [];
+    const unverified: string[] = [];
+
+    if (!apiData?.data) {
+        return { verified, unverified };
+    }
+
+    const pricePattern = /\$(\d+\.?\d*)|(\d+\.?\d*)\s*dollars?/gi;
+    const prices = extractNumbers(response, pricePattern);
+    for (const price of prices) {
+        if (validatePrice(price, apiData)) {
+            verified.push(`Price: $${price}`);
+        } else {
+            unverified.push(`Price: $${price}`);
         }
     }
-    
-    return scores;
+
+    const ratingPattern = /(\d+\.?\d*)\/10|rating[:\s]+(\d+\.?\d*)/gi;
+    const ratings = extractNumbers(response, ratingPattern);
+    for (const rating of ratings) {
+        if (rating >= 0 && rating <= 10) {
+            if (validateRating(rating, apiData)) {
+                verified.push(`Rating: ${rating}/10`);
+            } else {
+                unverified.push(`Rating: ${rating}/10`);
+            }
+        }
+    }
+
+    return { verified, unverified };
 };
 
 export const checkFacts = async (
@@ -76,44 +101,56 @@ export const checkFacts = async (
         const unverifiedClaims: string[] = [];
         const issues: string[] = [];
 
-        if (apiData) {
-            const scores = extractScores(response);
-            for (const score of scores) {
-                const isValid = validateScoreAgainstData(score.home, score.away, apiData);
-                if (isValid) {
-                    verifiedFacts.push(`Score: ${score.text}`);
-                } else {
-                    unverifiedClaims.push(`Score: ${score.text}`);
-                    issues.push(`Score "${score.text}" not found in API data`);
-                }
-            }
-        }
+        const isWikipediaData = apiData && apiData.source === 'wikipedia';
 
         if (response.length > 0) {
-            const factCheckPrompt = getFactCheckPrompt(response, apiData);
-            const model = getDefaultModel();
-            const llmResponse = await model.invoke(factCheckPrompt);
-            const llmContent = llmResponse.content as string;
-            
-            const confidenceMatch = llmContent.match(/confidence[:\s]+(high|medium|low)/i);
-            const llmConfidence = confidenceMatch 
-                ? (confidenceMatch[1].toLowerCase() as 'high' | 'medium' | 'low')
-                : 'medium';
-            
-            const hasWarnings = llmContent.toLowerCase().includes('cannot verify') || 
+            if (apiData && !isWikipediaData) {
+                const { verified, unverified } = validateGameData(response, apiData);
+                verifiedFacts.push(...verified);
+                unverifiedClaims.push(...unverified);
+                
+                if (verified.length > 0) {
+                    verifiedFacts.push('Information sourced from API data');
+                }
+            }
+
+            if (isWikipediaData) {
+                verifiedFacts.push('Information sourced from Wikipedia');
+            }
+
+            let llmConfidence: 'high' | 'medium' | 'low' = 'medium';
+            let hasWarnings = false;
+
+            if (unverifiedClaims.length > 0 || !apiData) {
+                const factCheckPrompt = getFactCheckPrompt(response, apiData);
+                // Use lightweight model for fact-checking (saves cost, still accurate)
+                const model = getLightweightModel();
+                const llmResponse = await model.invoke(factCheckPrompt);
+                const llmContent = llmResponse.content as string;
+                
+                const confidenceMatch = llmContent.match(/confidence[:\s]+(high|medium|low)/i);
+                llmConfidence = confidenceMatch 
+                    ? (confidenceMatch[1].toLowerCase() as 'high' | 'medium' | 'low')
+                    : 'medium';
+                
+                hasWarnings = llmContent.toLowerCase().includes('cannot verify') || 
                                llmContent.toLowerCase().includes('not in data') ||
                                llmContent.toLowerCase().includes('unsupported') ||
                                llmContent.toLowerCase().includes('not found');
-            
-            if (hasWarnings) {
-                issues.push('LLM flagged potential unverifiable claims');
+                
+                if (hasWarnings && !isWikipediaData) {
+                    issues.push('LLM flagged potential unverifiable claims');
+                }
             }
 
+            const hasUnverifiedData = unverifiedClaims.length > 0 || hasWarnings;
+            
             const confidence: 'high' | 'medium' | 'low' = 
-                unverifiedClaims.length === 0 && !hasWarnings && llmConfidence === 'high' ? 'high' :
-                unverifiedClaims.length === 0 && !hasWarnings ? 'medium' : 'low';
+                isWikipediaData && !hasUnverifiedData ? 'medium' :
+                unverifiedClaims.length === 0 && !hasUnverifiedData && llmConfidence === 'high' ? 'high' :
+                unverifiedClaims.length === 0 && !hasUnverifiedData ? 'medium' : 'low';
 
-            const isValid = unverifiedClaims.length === 0 && !hasWarnings;
+            const isValid = isWikipediaData || !hasUnverifiedData;
 
             return {
                 isValid,

@@ -1,9 +1,9 @@
 import { formatApiData } from './promptUtils';
 
 export const getChainOfThoughtPrompt = (userQuery: string, apiData?: unknown): string => {
-    const basePrompt = `You are an expert NFL assistant. When answering complex questions, break down your reasoning step by step.
+    const basePrompt = `You are an expert video games assistant. Use chain-of-thought reasoning internally to provide accurate, well-reasoned answers.
 
-REASONING PROCESS:
+INTERNAL REASONING PROCESS (think through these steps, but DO NOT show them in your response):
 1. Understand the question - What is the user really asking?
 2. Identify what information is needed - What data points are required?
 3. Analyze available data - What information do we have from APIs or knowledge?
@@ -20,31 +20,19 @@ USER QUERY: "${userQuery}"`;
 AVAILABLE DATA:
 ${formattedData}
 
-Now, think through your answer step by step:
-1. What specific information does the user need?
-2. What relevant data do we have from the API?
-3. How should I combine this data to answer the question?
-4. What is my final answer?
-
-Provide your reasoning, then give the final answer.`;
+IMPORTANT: Think through the reasoning steps internally, but only provide a clear, direct, and helpful answer to the user. Do NOT show your reasoning process or step-by-step breakdown. Just give the final, well-reasoned answer.`;
     }
 
     return `${basePrompt}
 
-Think through your answer step by step:
-1. What specific information does the user need?
-2. What do I know about this topic?
-3. How should I structure my response?
-4. What is my final answer?
-
-Provide your reasoning, then give the final answer.`;
+IMPORTANT: Think through the reasoning steps internally, but only provide a clear, direct, and helpful answer to the user. Do NOT show your reasoning process or step-by-step breakdown. Just give the final, well-reasoned answer.`;
 };
 
 export const getComparisonPrompt = (query: string, data1: unknown, data2: unknown): string => {
     const formattedData1 = formatApiData(data1);
     const formattedData2 = formatApiData(data2);
     
-    return `You are comparing two NFL entities (players, teams, games, etc.) based on the user's query.
+    return `You are comparing two video game entities (games, developers, platforms, etc.) based on the user's query.
 
 USER QUERY: "${query}"
 
@@ -62,7 +50,7 @@ SECOND ENTITY DATA:
 ${formattedData2}
 
 Think step by step:
-1. What specific attributes should I compare?
+1. What specific attributes should I compare? (e.g., price, rating, release date, features, reviews)
 2. What are the values for each attribute in both entities?
 3. What are the key differences?
 4. What is the conclusion?

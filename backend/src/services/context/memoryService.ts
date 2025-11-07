@@ -6,7 +6,7 @@ export const saveMessageToMemory = async (
     conversationId: string,
     role: 'user' | 'assistant',
     content: string,
-    intent?: 'game' | 'player' | 'team' | 'general',
+    intent?: 'game' | 'developer' | 'platform' | 'general',
     metadata?: { apiDataUsed?: boolean; [key: string]: any }
 ): Promise<void> => {
     try {

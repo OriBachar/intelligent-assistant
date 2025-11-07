@@ -8,7 +8,7 @@ CURRENT QUERY: "${currentQuery}"
 
 CONTEXT HANDLING GUIDELINES:
 1. Reference previous conversation when relevant (e.g., "As we discussed earlier...")
-2. Understand follow-up questions (e.g., "What about his touchdowns?" refers to previously mentioned player statistics)
+2. Understand follow-up questions (e.g., "What about its price?" refers to previously mentioned entity)
 3. Maintain consistency with previous answers
 4. If the query is ambiguous, use conversation history to clarify intent
 5. Don't repeat information already provided unless asked
@@ -28,7 +28,7 @@ ${conversationHistory}
 
 Create a concise summary that includes:
 1. Main topics discussed
-2. Key entities mentioned (players, teams, games)
+2. Key entities mentioned (games, developers, platforms, or other relevant entities)
 3. Important facts or data points shared
 4. User's interests or focus areas
 5. Any unresolved questions or topics
@@ -47,7 +47,7 @@ ${conversationHistory}
 ANALYSIS PROCESS:
 1. Does this query contain pronouns or references (he, she, they, it, that, etc.)?
 2. What in the conversation history do these refer to?
-3. Is this query incomplete without context? (e.g., "What about his touchdowns?")
+3. Is this query incomplete without context? (e.g., "What about its price?" or "Tell me more about that")
 4. What is the full, clarified question?
 
 Identify:

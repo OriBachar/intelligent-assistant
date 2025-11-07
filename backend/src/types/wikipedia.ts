@@ -1,38 +1,43 @@
-export interface WikipediaSearchResult {
-    pageid: number;
-    ns: number;
-    title: string;
-    size: number;
-    wordcount: number;
-    snippet: string;
-    timestamp: string;
-}
-
 export interface WikipediaSearchResponse {
     batchcomplete?: string;
-    continue?: {
-        sroffset: number;
-        continue: string;
-    };
-    query: {
-        searchinfo: {
+    query?: {
+        searchinfo?: {
             totalhits: number;
+            suggestion?: string;
+            suggestionsnippet?: string;
         };
-        search: WikipediaSearchResult[];
+        search?: Array<{
+            ns: number;
+            title: string;
+            pageid: number;
+            size: number;
+            wordcount: number;
+            snippet: string;
+            timestamp: string;
+        }>;
     };
-}
-
-export interface WikipediaPage {
-    pageid: number;
-    ns: number;
-    title: string;
-    extract: string;
-    fullurl: string;
 }
 
 export interface WikipediaPageResponse {
     batchcomplete?: string;
-    query: {
-        pages: Record<string, WikipediaPage>;
+    query?: {
+        pages?: {
+            [pageId: string]: {
+                pageid: number;
+                ns: number;
+                title: string;
+                extract?: string;
+                thumbnail?: {
+                    source: string;
+                    width: number;
+                    height: number;
+                };
+                original?: {
+                    source: string;
+                    width: number;
+                    height: number;
+                };
+            };
+        };
     };
 }

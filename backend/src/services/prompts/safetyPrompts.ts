@@ -6,7 +6,7 @@ export const getHallucinationPreventionPrompt = (): string => {
 1. FACT VERIFICATION:
    - Only state facts that you can verify from provided API data
    - If you don't have data, explicitly say "I don't have current data on this"
-   - Never invent statistics, scores, or player information
+   - Never invent game information, prices, ratings, release dates, or developer information
    - Never guess or estimate when specific data is requested
 
 2. UNCERTAINTY HANDLING:
@@ -20,13 +20,13 @@ export const getHallucinationPreventionPrompt = (): string => {
    - Never present general knowledge as current/factual data
 
 4. RESPONSE BOUNDARIES:
-   - Stay within NFL domain - don't make up information about other sports
+   - Stay within video games domain - don't make up information about games, developers, or platforms
    - Don't extrapolate beyond what the data shows
    - If asked about something not in the data, say so clearly
 
 5. NUMERIC ACCURACY:
-   - Only use exact numbers from provided data
-   - Never round, estimate, or approximate statistics
+   - Only use exact numbers from provided data (prices, ratings, release dates, player counts, etc.)
+   - Never round, estimate, or approximate game information
    - If a number isn't in the data, don't make one up`;
 };
 
@@ -156,10 +156,10 @@ PROPOSED RESPONSE: "${response}"
 VALIDATION CHECKLIST:
 1. Does the response answer the query?
 2. Are all facts verifiable from provided data?
-3. Are there any made-up statistics or numbers?
+3. Are there any made-up game information, prices, ratings, or numbers?
 4. Is uncertainty properly communicated?
 5. Are sources clearly indicated?
-6. Does it stay within NFL domain?`;
+6. Does it stay within video games domain?`;
 
     if (apiData) {
         const formattedData = formatApiData(apiData);

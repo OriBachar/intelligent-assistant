@@ -20,13 +20,13 @@ const calculateConfidence = (
     }
 
     const hasApiData = apiData !== null && apiData !== undefined;
+    const isWikipediaData = apiData && apiData.source === 'wikipedia';
     const responseLower = response.toLowerCase();
     
     const hasUncertaintyMarkers = 
         responseLower.includes('uncertain') ||
         responseLower.includes('not sure') ||
         responseLower.includes('may not be') ||
-        responseLower.includes('general knowledge') ||
         responseLower.includes('i don\'t have') ||
         responseLower.includes('i don\'t have current data') ||
         responseLower.includes('not available');
@@ -35,6 +35,8 @@ const calculateConfidence = (
         responseLower.includes('according to the data') ||
         responseLower.includes('based on the api data') ||
         responseLower.includes('from the data provided') ||
+        responseLower.includes('according to') ||
+        responseLower.includes('sources:') ||
         (hasApiData && !hasUncertaintyMarkers);
     
     let score = 50;
@@ -61,6 +63,20 @@ const calculateConfidence = (
             score = 30;
             overall = 'low';
             reasons.push('Fact check returned low confidence');
+        }
+    } else if (isWikipediaData) {
+        if (hasHighConfidenceMarkers && !hasUncertaintyMarkers) {
+            score = 70;
+            overall = 'medium';
+            reasons.push('Response sourced from Wikipedia with clear references');
+        } else if (hasUncertaintyMarkers) {
+            score = 50;
+            overall = 'medium';
+            reasons.push('Wikipedia data available but response shows some uncertainty');
+        } else {
+            score = 65;
+            overall = 'medium';
+            reasons.push('Wikipedia data available - general knowledge response');
         }
     } else if (hasApiData) {
         if (hasHighConfidenceMarkers && !hasUncertaintyMarkers) {

@@ -6,11 +6,15 @@
   "scripts": {
     "start": "node dist/server.js",
     "dev": "nodemon src/server.ts",
-    "build": "tsc"
+    "build": "tsc",
+    "cli": "ts-node src/cli/cli.ts",
+    "test-apis": "ts-node src/test-apis.ts"
   },
   "dependencies": {
+    "@langchain/deepseek": "^1.0.0",
     "@langchain/groq": "^1.0.0",
     "@langchain/langgraph": "^1.0.1",
+    "@langchain/openai": "^1.0.0",
     "axios": "^1.6.2",
     "compression": "^1.7.5",
     "cors": "^2.8.5",

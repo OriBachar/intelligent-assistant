@@ -17,8 +17,14 @@ export const createApiInstance = (config: ApiConfig, serviceName: string): Axios
         (response) => response,
         (error: AxiosError) => {
             if (error.response) {
+                const errorData = error.response.data;
+                const errorMessage = typeof errorData === 'string' 
+                    ? errorData 
+                    : (errorData && typeof errorData === 'object' && 'message' in errorData)
+                        ? String(errorData.message)
+                        : JSON.stringify(errorData);
                 throw new Error(
-                    `${serviceName} API error: ${error.response.status} - ${error.response.statusText}`
+                    `${serviceName} API error: ${error.response.status} - ${error.response.statusText}\nDetails: ${errorMessage}`
                 );
             } else if (error.request) {
                 throw new Error(`${serviceName} API request failed - no response received`);
@@ -35,3 +41,4 @@ export const handleApiError = (error: unknown, operation: string): never => {
     const message = error instanceof Error ? error.message : 'Unknown error';
     throw new Error(`Failed to ${operation}: ${message}`);
 };
+
