@@ -8,9 +8,6 @@ export interface CombinedIntentResult {
     parsedQuery: ParsedGameQuery;
 }
 
-/**
- * Combined intent classification + query parsing (saves 1 LLM call)
- */
 export const classifyIntentAndParseQuery = async (
     userInput: string
 ): Promise<CombinedIntentResult> => {
@@ -21,7 +18,6 @@ export const classifyIntentAndParseQuery = async (
         const response = await model.invoke(prompt);
         const content = response.content as string;
         
-        // Extract JSON from response
         const jsonMatch = content.match(/\{[\s\S]*\}/);
         if (jsonMatch) {
             const parsed = JSON.parse(jsonMatch[0]);
@@ -51,7 +47,6 @@ export const classifyIntentAndParseQuery = async (
         console.error('Error in combined intent parsing:', error);
     }
     
-    // Fallback to general intent
     return {
         intent: 'general',
         needsApiData: false,

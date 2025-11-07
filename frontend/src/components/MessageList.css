@@ -44,3 +44,31 @@
   color: #666;
 }
 
+.message-images {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+  max-width: 100%;
+}
+
+.message-image {
+  max-width: 200px;
+  max-height: 150px;
+  width: auto;
+  height: auto;
+  border-radius: 6px;
+  object-fit: cover;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.message-image:hover {
+  transform: scale(1.05);
+}
+
+.message-image:first-child {
+  max-width: 300px;
+  max-height: 200px;
+}
+

@@ -4,11 +4,28 @@ import MessageList from './MessageList';
 import MessageInput from './MessageInput';
 import './ChatInterface.css';
 
+const CONVERSATION_ID_KEY = 'currentConversationId';
+
+interface Message {
+  role: 'user' | 'assistant';
+  content: string;
+  timestamp: Date;
+  images?: {
+    covers?: string[];
+    screenshots?: string[];
+    backgroundImages?: string[];
+    trailers?: string[];
+  };
+}
+
 export default function ChatInterface() {
-  const [messages, setMessages] = useState<Array<{ role: 'user' | 'assistant'; content: string; timestamp: Date }>>([]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [conversationId, setConversationId] = useState<string | undefined>();
+  const [conversationId, setConversationId] = useState<string | undefined>(() => {
+    return localStorage.getItem(CONVERSATION_ID_KEY) || undefined;
+  });
+  const [isLoadingHistory, setIsLoadingHistory] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -19,10 +36,35 @@ export default function ChatInterface() {
     scrollToBottom();
   }, [messages]);
 
+  useEffect(() => {
+    const loadConversationHistory = async () => {
+      if (conversationId) {
+        setIsLoadingHistory(true);
+        try {
+          const historyMessages = await chatApi.getConversationMessages(conversationId);
+          const formattedMessages = historyMessages.map((msg) => ({
+            role: msg.role,
+            content: msg.content,
+            timestamp: new Date(msg.createdAt),
+            images: (msg as any).metadata?.images,
+          }));
+          setMessages(formattedMessages);
+        } catch (err) {
+          console.error('Failed to load conversation history:', err);
+          localStorage.removeItem(CONVERSATION_ID_KEY);
+          setConversationId(undefined);
+        } finally {
+          setIsLoadingHistory(false);
+        }
+      }
+    };
+
+    loadConversationHistory();
+  }, [conversationId]);
+
   const handleSendMessage = async (message: string) => {
     if (!message.trim() || isLoading) return;
 
-    // Add user message immediately
     const userMessage = {
       role: 'user' as const,
       content: message,
@@ -35,16 +77,18 @@ export default function ChatInterface() {
     try {
       const response: ChatResponse = await chatApi.sendMessage(message, conversationId);
       
-      // Update conversation ID if this is a new conversation
-      if (response.conversationId && !conversationId) {
-        setConversationId(response.conversationId);
+      if (response.conversationId) {
+        if (!conversationId) {
+          setConversationId(response.conversationId);
+          localStorage.setItem(CONVERSATION_ID_KEY, response.conversationId);
+        }
       }
 
-      // Add assistant response
-      const assistantMessage = {
+      const assistantMessage: Message = {
         role: 'assistant' as const,
         content: response.response,
         timestamp: new Date(),
+        images: response.metadata?.images,
       };
       setMessages((prev) => [...prev, assistantMessage]);
     } catch (err) {
@@ -59,7 +103,12 @@ export default function ChatInterface() {
   return (
     <div className="chat-interface">
       <div className="chat-messages">
-        {messages.length === 0 && (
+        {isLoadingHistory ? (
+          <div className="loading-indicator">
+            <div className="spinner"></div>
+            <span>Loading conversation history...</span>
+          </div>
+        ) : messages.length === 0 ? (
           <div className="welcome-message">
             <h2>Video Games Intelligent Assistant</h2>
             <p>Ask me anything about video games!</p>
@@ -70,8 +119,8 @@ export default function ChatInterface() {
               <br />• "What games are on PlayStation 5?"
             </p>
           </div>
-        )}
-        <MessageList messages={messages} />
+        ) : null}
+        {!isLoadingHistory && <MessageList messages={messages} />}
         {isLoading && (
           <div className="loading-indicator">
             <div className="spinner"></div>

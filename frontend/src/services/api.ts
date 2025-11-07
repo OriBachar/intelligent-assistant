@@ -21,6 +21,13 @@ export interface ChatRequest {
   conversationId?: string;
 }
 
+export interface ChatImages {
+  covers?: string[];
+  screenshots?: string[];
+  backgroundImages?: string[];
+  trailers?: string[];
+}
+
 export interface ChatResponse {
   response: string;
   conversationId: string;
@@ -28,6 +35,29 @@ export interface ChatResponse {
   confidence?: string;
   valid?: boolean;
   processingTime?: number;
+  metadata?: {
+    apiDataUsed?: boolean;
+    images?: ChatImages;
+  };
+}
+
+export interface Conversation {
+  _id: string;
+  title?: string;
+  summary?: string;
+  messageCount: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ConversationMessage {
+  _id: string;
+  conversationId: string;
+  role: 'user' | 'assistant';
+  content: string;
+  intent?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export const chatApi = {
@@ -37,6 +67,25 @@ export const chatApi = {
       conversationId,
     });
     return response.data;
+  },
+  
+  getAllConversations: async (): Promise<Conversation[]> => {
+    const response = await apiClient.get<{ conversations: Conversation[] }>('/conversations');
+    return response.data.conversations;
+  },
+  
+  getConversation: async (id: string): Promise<Conversation> => {
+    const response = await apiClient.get<Conversation>(`/conversations/${id}`);
+    return response.data;
+  },
+  
+  getConversationMessages: async (id: string): Promise<ConversationMessage[]> => {
+    const response = await apiClient.get<{ messages: ConversationMessage[] }>(`/conversations/${id}/messages`);
+    return response.data.messages;
+  },
+  
+  deleteConversation: async (id: string): Promise<void> => {
+    await apiClient.delete(`/conversations/${id}`);
   },
 };
 

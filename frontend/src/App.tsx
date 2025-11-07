@@ -10,7 +10,7 @@ function App() {
       <main className="app-main">
         <ChatInterface />
       </main>
-    </div>
+      </div>
   )
 }
 

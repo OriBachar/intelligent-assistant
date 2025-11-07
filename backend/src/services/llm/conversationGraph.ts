@@ -158,7 +158,6 @@ export const runConversation = async (
     if (!isFollowUp && apiData && response.length > 50) {
         validation = await validateResponse(response, apiData, userInput);
         
-        // Only mitigate for low confidence (skip medium confidence)
         if (validation.shouldMitigate && validation.confidence.overall === 'low') {
             mitigation = await mitigateHallucination(response, validation, apiData, conversationHistory);
             

@@ -5,6 +5,7 @@ import { createConversation, getConversationById } from '../services/context/con
 import { getMemoryMessages, saveMessageToMemory } from '../services/context/memoryService';
 import { AppError } from '../types/error';
 import { asyncHandler } from '../utils/asyncHandler';
+import { extractImagesFromApiData } from '../services/games/imageExtractor';
 
 interface ChatRequest {
     message: string;
@@ -52,6 +53,8 @@ export const handleChat = asyncHandler(async (req: Request, res: Response) => {
         const { response, state } = await runConversation(message, conversationHistory);
 
         const apiDataUsed = state.needsApiData === true || state.apiData !== null;
+        
+        const images = state.apiData ? extractImagesFromApiData(state.apiData) : undefined;
 
         await saveMessageToMemory(
             currentConversationId,
@@ -70,6 +73,7 @@ export const handleChat = asyncHandler(async (req: Request, res: Response) => {
             state.intent,
             {
                 apiDataUsed,
+                images,
                 validation: state.validation ? {
                     isValid: state.validation.isValid,
                     confidence: state.validation.confidence.overall,
@@ -93,6 +97,7 @@ export const handleChat = asyncHandler(async (req: Request, res: Response) => {
             } : undefined,
             metadata: {
                 apiDataUsed,
+                images,
             },
         };
 

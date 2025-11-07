@@ -136,7 +136,7 @@ export const getAppPrice = async (
     }
 
     return {
-        price: appData.price_overview.final / 100, // Convert from cents
+        price: appData.price_overview.final / 100,
         currency: appData.price_overview.currency,
         discount: appData.price_overview.discount_percent,
         isFree: false,

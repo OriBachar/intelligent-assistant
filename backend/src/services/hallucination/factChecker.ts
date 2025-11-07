@@ -123,7 +123,6 @@ export const checkFacts = async (
 
             if (unverifiedClaims.length > 0 || !apiData) {
                 const factCheckPrompt = getFactCheckPrompt(response, apiData);
-                // Use lightweight model for fact-checking (saves cost, still accurate)
                 const model = getLightweightModel();
                 const llmResponse = await model.invoke(factCheckPrompt);
                 const llmContent = llmResponse.content as string;
