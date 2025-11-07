@@ -7,8 +7,7 @@
     "start": "node dist/server.js",
     "dev": "nodemon src/server.ts",
     "build": "tsc",
-    "cli": "ts-node src/cli/cli.ts",
-    "test-apis": "ts-node src/test-apis.ts"
+    "cli": "ts-node src/cli/cli.ts"
   },
   "dependencies": {
     "@langchain/deepseek": "^1.0.0",

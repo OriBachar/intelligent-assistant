@@ -4,6 +4,7 @@ import * as rawgService from './rawgService';
 import * as igdbService from './igdbService';
 import * as steamService from './steamService';
 import * as wikipediaService from './wikipediaService';
+import { searchDevelopersWithStrategy, getBestMatch } from './entityMatcher';
 
 export interface FetchedGameData {
     source: SelectedApi;
@@ -133,49 +134,53 @@ const fetchDeveloperData = async (
 ): Promise<unknown> => {
     const { entities } = parsedQuery;
 
-    let companyId: number | null = null;
-    let companies: any[] = [];
+    const searchQuery = hasItems(entities?.developerNames) 
+        ? entities!.developerNames![0] 
+        : userInput;
 
-    if (hasItems(entities?.developerNames)) {
-        const developerName = entities!.developerNames![0];
-        companies = await igdbService.getDevelopers(developerName);
-        if (companies.length > 0) {
-            companyId = companies[0].id;
-        }
-    } else {
-        companies = await igdbService.getDevelopers(userInput);
-        if (companies.length > 0) {
-            companyId = companies[0].id;
-        }
-    }
+    const companies = await searchDevelopersWithStrategy(searchQuery);
+    const bestMatch = getBestMatch(searchQuery, companies);
 
-    if (!companyId) {
+    if (!bestMatch) {
         return { companies };
     }
 
+    const companyId = bestMatch.id;
     const companyDetails = await igdbService.getCompanyById(companyId);
-    const result: Record<string, unknown> = { companies, companyDetails };
+    const result: Record<string, unknown> = { 
+        companies, 
+        companyDetails,
+        bestMatch 
+    };
 
-    try {
-        const developedGames = await igdbService.getGamesByDeveloper(companyId, { limit: 20 });
-        
-        if (developedGames.length > 0) {
-            result.games = developedGames;
-        }
-    } catch (error) {
-        console.warn('Error fetching games for developer:', error);
-        if (companyDetails?.developed && companyDetails.developed.length > 0) {
-            try {
-                const developedGames = await igdbService.getGamesByIds(
-                    companyDetails.developed.slice(0, 20)
-                );
-                if (developedGames.length > 0) {
-                    result.games = developedGames;
-                }
-            } catch (fallbackError) {
-                console.warn('Error fetching games by IDs:', fallbackError);
+    let games: unknown[] = [];
+
+    if (companyDetails?.developed && Array.isArray(companyDetails.developed) && companyDetails.developed.length > 0) {
+        try {
+            const developedGames = await igdbService.getGamesByIds(
+                companyDetails.developed.slice(0, 20)
+            );
+            if (developedGames && developedGames.length > 0) {
+                games = developedGames;
             }
+        } catch (fallbackError) {
+            console.error('Error fetching games by IDs for developer:', fallbackError);
         }
+    }
+
+    if (games.length === 0) {
+        try {
+            const developedGames = await igdbService.getGamesByDeveloper(companyId, { limit: 20 });
+            if (developedGames && developedGames.length > 0) {
+                games = developedGames;
+            }
+        } catch (error) {
+            console.error('Error fetching games by developer:', error);
+        }
+    }
+
+    if (games.length > 0) {
+        result.games = games;
     }
 
     return result;

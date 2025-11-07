@@ -212,13 +212,22 @@ export const getGameReviews = async (
         params.num_per_page = Math.min(Math.max(1, options.num_per_page), 100);
     }
 
-    const response = await makeStoreRequest<ReviewsResponse>(
-        '/appreviews',
-        params,
-        `get reviews for ${appId}`
-    );
+    try {
+        const response = await makeStoreRequest<ReviewsResponse>(
+            '/appreviews',
+            params,
+            `get reviews for ${appId}`
+        );
 
-    return response.success === 1 ? response : null;
+        return response.success === 1 ? response : null;
+    } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        if (errorMessage.includes('403') || errorMessage.includes('Forbidden') || errorMessage.includes('access denied')) {
+            console.warn(`Steam reviews API returned 403 Forbidden for app ${appId}. Reviews may not be available due to Steam API restrictions.`);
+            return null;
+        }
+        throw error;
+    }
 };
 
 const normalizeString = (str: string): string => {
