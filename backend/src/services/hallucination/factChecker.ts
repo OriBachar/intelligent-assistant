@@ -59,6 +59,82 @@ const validateRating = (rating: number, apiData: any): boolean => {
     return false;
 };
 
+const extractGameNames = (text: string): string[] => {
+    const gameNames: string[] = [];
+    const lines = text.split('\n');
+    
+    for (const line of lines) {
+        const trimmed = line.trim();
+        if (!trimmed || trimmed.length < 3) continue;
+        
+        const numberedMatch = trimmed.match(/^\d+\.\s+(.+?)(?:\s*\(|$)/);
+        if (numberedMatch) {
+            gameNames.push(numberedMatch[1].trim());
+            continue;
+        }
+        
+        const bulletMatch = trimmed.match(/^[-•*]\s+(.+?)(?:\s*\(|$)/);
+        if (bulletMatch) {
+            gameNames.push(bulletMatch[1].trim());
+            continue;
+        }
+        
+        if (trimmed.match(/^[A-Z][^:]+$/)) {
+            const colonMatch = trimmed.match(/^([^:]+):/);
+            if (colonMatch && colonMatch[1].length > 3 && colonMatch[1].length < 100) {
+                gameNames.push(colonMatch[1].trim());
+            }
+        }
+    }
+    
+    return gameNames.filter(name => name.length > 2 && name.length < 100);
+};
+
+const normalizeGameName = (name: string): string => {
+    return name.toLowerCase()
+        .replace(/[^\w\s]/g, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+};
+
+const validateGameNames = (response: string, apiData: any): { verified: string[]; unverified: string[] } => {
+    const verified: string[] = [];
+    const unverified: string[] = [];
+    
+    if (!apiData?.data) {
+        return { verified, unverified };
+    }
+    
+    const data = apiData.data;
+    
+    if (data.games && Array.isArray(data.games) && data.games.length > 0) {
+        const apiGameNames = data.games.map((game: any) => {
+            const name = game.name || game.title || '';
+            return normalizeGameName(name);
+        }).filter((name: string) => name.length > 0);
+        
+        if (apiGameNames.length > 0) {
+            const responseGameNames = extractGameNames(response);
+            
+            for (const responseGame of responseGameNames) {
+                const normalized = normalizeGameName(responseGame);
+                const isInApi = apiGameNames.some((apiName: string) => {
+                    return apiName.includes(normalized) || normalized.includes(apiName) || 
+                           normalized === apiName;
+                });
+                
+                if (isInApi) {
+                    verified.push(`Game: ${responseGame}`);
+                } else {
+                    unverified.push(`Game: ${responseGame} (not in API data)`);
+                }
+            }
+        }
+    }
+    
+    return { verified, unverified };
+};
+
 const validateGameData = (response: string, apiData: any): { verified: string[]; unverified: string[] } => {
     const verified: string[] = [];
     const unverified: string[] = [];
@@ -88,6 +164,10 @@ const validateGameData = (response: string, apiData: any): { verified: string[];
             }
         }
     }
+    
+    const gameNameValidation = validateGameNames(response, apiData);
+    verified.push(...gameNameValidation.verified);
+    unverified.push(...gameNameValidation.unverified);
 
     return { verified, unverified };
 };
