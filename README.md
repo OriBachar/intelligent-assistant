@@ -42,7 +42,7 @@ Build a conversational AI assistant that leverages LLMs to deliver coherent, con
 4. **Context Management**: Built MongoDB-based conversation store with LangChain memory management
 
 ### Results
-- ✅ **Exceeds Requirements**: 4 APIs, both CLI and Web UI, advanced validation
+- ✅ **Requirements**: 4 APIs, both CLI and Web UI, advanced validation
 - ✅ **Robust Implementation**: Comprehensive error handling, validation at multiple levels, production-ready architecture
 - ✅ **User Experience**: Natural conversation flow, ChatGPT-like interface, clear validation feedback
 - ✅ **Documentation**: Complete README with 13 screenshots, video demo, and technical details
@@ -166,7 +166,7 @@ See [How to Run](#how-to-run) section for detailed setup instructions.
 
 ### 4. ✅ External Data Integration
 
-#### API Connections (4 APIs - Exceeds Requirement)
+#### API Connections (4 APIs)
 1. **RAWG.io**: Game details, reviews, ratings, screenshots
 2. **IGDB**: Developers, publishers, platforms, game data
 3. **Steam Web API**: Prices, player counts, reviews
@@ -503,7 +503,7 @@ All conversations are saved and persist across sessions. The sidebar shows:
 
 ## Key Achievements
 
-✅ **Exceeds Requirements**:
+✅ **Requirements**:
 - 4 APIs integrated
 - Both CLI and Web UI implemented
 - Advanced hallucination detection
