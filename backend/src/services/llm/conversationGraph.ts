@@ -139,7 +139,7 @@ export const runConversation = async (
         intent = combinedResult.intent;
         needsApiData = combinedResult.needsApiData;
         
-        if (needsApiData || intent === 'general') {
+        if (needsApiData || (intent === 'general' && combinedResult.isGamingRelated)) {
             apiData = await fetchGameData(combinedResult.parsedQuery, userInput);
         }
     } else {
