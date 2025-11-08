@@ -87,6 +87,11 @@ export const chatApi = {
   deleteConversation: async (id: string): Promise<void> => {
     await apiClient.delete(`/conversations/${id}`);
   },
+  
+  updateConversation: async (id: string, updates: { title?: string; summary?: string }): Promise<Conversation> => {
+    const response = await apiClient.put<Conversation>(`/conversations/${id}`, updates);
+    return response.data;
+  },
 };
 
 export default apiClient;

@@ -3,17 +3,114 @@
 }
 
 :root {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  /* Navan Color Palette - Blue */
+  --blue-50: #f0f0ff;
+  --blue-100: #c3c4fd;
+  --blue-200: #a6a7fc;
+  --blue-300: #8e6afb;
+  --blue-400: #6939f9;
+  --blue-500: #6307f8;
+  --blue-600: #4800c5;
+  --blue-700: #360092;
+  --blue-800: #1b005f;
+  --blue-900: #15002c;
+
+  /* Navan Color Palette - Purple */
+  --purple-50: #f8ecff;
+  --purple-100: #edcfff;
+  --purple-200: #da9eff;
+  --purple-300: #a76bcc;
+  --purple-400: #8e6afb;
+  --purple-500: #7c51fa;
+  --purple-600: #6307f8;
+  --purple-700: #4800c5;
+  --purple-800: #28004d;
+  --purple-900: #0e0033;
+  --purple-1000: #f2ebf9;
+
+  /* Navan Color Palette - Red */
+  --red-50: #feeded;
+  --red-100: #fedbdb;
+  --red-200: #fdc9c9;
+  --red-300: #fcb6b6;
+  --red-400: #fba4a4;
+  --red-500: #fb9292;
+  --red-600: #fa8080;
+  --red-700: #f85c5c;
+  --red-800: #f84949;
+
+  /* Navan Color Palette - Neutral (inferred) */
+  --black-900: #060000;
+  --black-800: #000;
+  --black-700: #222;
+  --white-900: #fff;
+  --white-1000: #fff;
+  --transparent: transparent;
+
+  /* Semantic Color Mappings */
+  --color-primary: var(--blue-500);
+  --color-primary-dark: var(--blue-600);
+  --color-primary-light: var(--blue-50);
+  --color-primary-hover: var(--blue-400);
+
+  /* Neutral Colors */
+  --color-black: var(--black-900);
+  --color-gray-800: var(--black-700);
+  --color-gray-600: #4E5358;
+  --color-gray-400: #9CA3AF;
+  --color-gray-300: #D4D8DC;
+  --color-gray-100: #F4F6F8;
+  --color-white: var(--white-900);
+
+  /* Semantic Colors */
+  --color-success: #00B28F;
+  --color-warning: #FFBC2C;
+  --color-error: var(--red-800);
+
+  /* Typography */
+  --font-sans: "Neue Hass Grotesk Text", "Inter", "Helvetica Neue", Arial, ui-sans-serif, system-ui, sans-serif;
+  --text-hero: 64px;
+  --text-h1: 44px;
+  --text-h2: 32px;
+  --text-h3: 24px;
+  --text-body-lg: 18px;
+  --text-body: 16px;
+  --text-small: 14px;
+
+  /* Spacing */
+  --space-2: 2px;
+  --space-4: 4px;
+  --space-8: 8px;
+  --space-12: 12px;
+  --space-16: 16px;
+  --space-20: 20px;
+  --space-24: 24px;
+  --space-32: 32px;
+  --space-48: 48px;
+  --space-64: 64px;
+
+  /* Radius & Shadow */
+  --radius: 8px;
+  --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+  /* Base Styles */
+  font-family: var(--font-sans);
   line-height: 1.5;
   font-weight: 400;
-
-  color: #333;
-  background-color: #ffffff;
-
+  color: var(--color-gray-800);
+  background-color: var(--color-white);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
+  -webkit-font-smoothing: antialiased !important;
   -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+  font-feature-settings: normal;
+  font-variation-settings: normal;
+}
+
+::selection {
+  background: var(--blue-200);
 }
 
 body {

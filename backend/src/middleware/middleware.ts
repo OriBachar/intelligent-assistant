@@ -45,7 +45,22 @@ app.use(helmet({
 
 app.use(cors({
     origin: (origin, callback) => {
-        if (!origin || config.server.whitelist.indexOf(origin) !== -1) {
+        if (!origin) {
+            callback(null, true);
+            return;
+        }
+        
+        if (config.server.env === 'development') {
+            const localhostRegex = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/;
+            if (localhostRegex.test(origin)) {
+                callback(null, true);
+                return;
+            }
+        }
+        
+        if (config.server.whitelist.length > 0 && config.server.whitelist.indexOf(origin) !== -1) {
+            callback(null, true);
+        } else if (config.server.whitelist.length === 0 && config.server.env === 'development') {
             callback(null, true);
         } else {
             callback(new AppError('Not allowed by CORS', 403));

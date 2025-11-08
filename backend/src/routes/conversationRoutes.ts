@@ -10,8 +10,8 @@ import {
 const router = Router();
 
 router.get('/', getAllConversationsHandler);
-router.get('/:id', getConversationByIdHandler);
 router.get('/:id/messages', getConversationMessagesHandler);
+router.get('/:id', getConversationByIdHandler);
 router.put('/:id', updateConversationHandler);
 router.delete('/:id', deleteConversationHandler);
 

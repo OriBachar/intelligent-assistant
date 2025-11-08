@@ -1,0 +1,247 @@
+.conversation-sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  height: 100vh;
+  width: 260px;
+  background: #171717;
+  color: #ececec;
+  display: flex;
+  flex-direction: column;
+  z-index: 1000;
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+  border-right: 1px solid #2f2f2f;
+}
+
+.conversation-sidebar.open {
+  transform: translateX(0);
+}
+
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.sidebar-overlay.open {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.sidebar-header {
+  padding: 12px;
+  border-bottom: 1px solid #2f2f2f;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.new-chat-button {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  background: transparent;
+  border: 1px solid #565869;
+  border-radius: 6px;
+  color: #ececec;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.new-chat-button:hover {
+  background: #2f2f2f;
+  border-color: #8e8ea0;
+}
+
+.new-chat-button svg {
+  flex-shrink: 0;
+}
+
+.sidebar-toggle {
+  padding: 10px;
+  background: transparent;
+  border: none;
+  color: #ececec;
+  cursor: pointer;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.sidebar-toggle:hover {
+  background: #2f2f2f;
+}
+
+.sidebar-toggle svg {
+  transform: rotate(180deg);
+}
+
+.sidebar-content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 8px;
+}
+
+.sidebar-loading,
+.sidebar-empty {
+  padding: 24px;
+  text-align: center;
+  color: #8e8ea0;
+  font-size: 14px;
+}
+
+.sidebar-empty-hint {
+  font-size: 12px;
+  margin-top: 8px;
+  opacity: 0.7;
+}
+
+.sidebar-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.sidebar-loading .spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #2f2f2f;
+  border-top: 2px solid #ececec;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.conversations-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.conversation-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s;
+  position: relative;
+}
+
+.conversation-item:hover {
+  background: #2f2f2f;
+}
+
+.conversation-item:hover .conversation-delete {
+  opacity: 1;
+}
+
+.conversation-item.active {
+  background: #343541;
+}
+
+.conversation-item-content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.conversation-title {
+  font-size: 14px;
+  color: #ececec;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.conversation-meta {
+  font-size: 11px;
+  color: #8e8ea0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.conversation-delete {
+  opacity: 0;
+  padding: 4px;
+  background: transparent;
+  border: none;
+  color: #8e8ea0;
+  cursor: pointer;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.conversation-delete:hover {
+  background: #565869;
+  color: #ececec;
+}
+
+.sidebar-toggle-fixed {
+  position: fixed;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 998;
+  padding: 12px;
+  background: #171717;
+  border: 1px solid #2f2f2f;
+  border-radius: 8px;
+  color: #ececec;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.sidebar-toggle-fixed:hover {
+  background: #2f2f2f;
+  border-color: #565869;
+}
+
+@media (min-width: 768px) {
+  .conversation-sidebar {
+    position: relative;
+    transform: translateX(0);
+    height: 100%;
+  }
+
+  .sidebar-overlay {
+    display: none;
+  }
+
+  .sidebar-toggle {
+    display: none;
+  }
+
+  .sidebar-toggle-fixed {
+    display: none;
+  }
+}
+
