@@ -498,10 +498,6 @@ All conversations are saved and persist across sessions. The sidebar shows:
 1. Starting a new conversation
 2. Asking a game query
 3. Follow-up questions maintaining context
-4. Switching to another conversation
-5. Showing validation in console
-6. Demonstrating API integration
-7. Conversation management features
 
 ---
 
