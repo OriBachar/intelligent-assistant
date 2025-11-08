@@ -430,9 +430,7 @@ All conversations are saved and persist across sessions. The sidebar shows:
 ---
 
 ### Example 10: Full Conversation Flow (Video Demo)
-**Video Demo**: [Watch Complete System Demonstration](https://github.com/OriBachar/intelligent-assistant/raw/main/screenshots/video_games_intelligent_assistant_video_demo.mp4)
-
-*Note: Click the link above to watch the video. It will open in your browser's video player.*
+**Video Demo**: [Watch Complete System Demonstration](https://www.awesomescreenshot.com/video/46163128?key=58790b2396da0b0dc536a50ba07f2044)
 
 *This video demonstrates:*
 1. Starting a new conversation
